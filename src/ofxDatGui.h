@@ -96,6 +96,13 @@ class ofxDatGui : public ofxDatGuiInteractiveObject
         ofxDatGuiValuePlotter* getValuePlotter(string label, string folder = "");
         ofxDatGuiFolder* getFolder(string label);
         ofxDatGuiDropdown* getDropdown(string label);
+
+        void ofxDatGui::enableFboMode(bool enable, int width, int height);
+        ofTexture& getFboTexture();
+
+        void setScrollY(float y);
+        void scroll(float deltaY);
+        float getScrollY() const;
     
     private:
     
@@ -153,4 +160,9 @@ class ofxDatGui : public ofxDatGuiInteractiveObject
         void onColorPickerEventCallback(ofxDatGuiColorPickerEvent e);
         void onMatrixEventCallback(ofxDatGuiMatrixEvent e);
 
+        ofFbo mFbo;
+        bool mUseFbo = false;
+        ofVec2f mFboSize;
+
+        ofVec2f mScrollOffset = ofVec2f(0, 0);
 };

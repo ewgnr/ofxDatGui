@@ -906,33 +906,80 @@ void ofxDatGui::update()
     trash.clear();
 }
 
-void ofxDatGui::draw()
-{
-    if (mVisible == false) return;
-    ofPushStyle();
-        ofFill();
-        ofSetColor(mGuiBackground, mAlpha * 255);
-        if (mExpanded == false){
-            ofDrawRectangle(mPosition.x, mPosition.y, mWidth, mGuiFooter->getHeight());
-            mGuiFooter->draw();
-        }   else{
-            ofDrawRectangle(mPosition.x, mPosition.y, mWidth, mHeight - mRowSpacing);
-            for (int i=0; i<items.size(); i++) items[i]->draw();
-        // color pickers overlap other components when expanded so they must be drawn last //
-            for (int i=0; i<items.size(); i++) items[i]->drawColorPicker();
+    void ofxDatGui::draw()
+    {
+        if (mVisible == false) return;
+        ofPushStyle();
+        ofPushMatrix();
+        ofTranslate(0, -mScrollOffset.y); // apply vertical scroll
+            ofFill();
+            ofSetColor(mGuiBackground, mAlpha * 255);
+            if (mExpanded == false){
+                ofDrawRectangle(mPosition.x, mPosition.y, mWidth, mGuiFooter->getHeight());
+                mGuiFooter->draw();
+            }   else {
+                ofDrawRectangle(mPosition.x, mPosition.y, mWidth, mHeight - mRowSpacing);
+                for (int i=0; i<items.size(); i++) items[i]->draw();
+            // color pickers overlap other components when expanded so they must be drawn last //
+                for (int i=0; i<items.size(); i++) items[i]->drawColorPicker();
+            }
+        ofPopMatrix();
+        ofPopStyle();
+    }
+
+    void ofxDatGui::onDraw(ofEventArgs &e)
+    {
+        if (!mVisible) return;
+
+        if (mUseFbo) {
+            mFbo.begin();
+            ofClear(0, 0, 0, 0); // transparent
+            draw(); // draw GUI into FBO
+            mFbo.end();
         }
-    ofPopStyle();
-}
+        else 
+        {
+            draw(); // original behavior
+        }
+    }
 
-void ofxDatGui::onDraw(ofEventArgs &e)
-{
-    draw();
-}
+    void ofxDatGui::enableFboMode(bool enable, int width, int height)
+    {
+        mUseFbo = enable;
+        if (enable) {
+            mFboSize.set(width, height);
+            mFbo.allocate(width, height, GL_RGBA);
+            mFbo.begin();
+            ofClear(0, 0, 0, 0);
+            mFbo.end();
+        }
+    }
 
-void ofxDatGui::onUpdate(ofEventArgs &e)
-{
-    update();
-}
+    ofTexture& ofxDatGui::getFboTexture()
+    {
+        return mFbo.getTexture();
+    }
+
+    void ofxDatGui::setScrollY(float y)
+    {
+        mScrollOffset.y = y;
+    }
+
+    void ofxDatGui::scroll(float deltaY)
+    {
+        float maxScroll = std::max(0.0f, mHeight - mFboSize.y);
+        mScrollOffset.y = ofClamp(mScrollOffset.y + deltaY, 0.0f, maxScroll);
+    }
+
+    float ofxDatGui::getScrollY() const
+    {
+        return mScrollOffset.y;
+    }
+
+    void ofxDatGui::onUpdate(ofEventArgs &e)
+    {
+        update();
+    }
 
 void ofxDatGui::onWindowResized(ofResizeEventArgs &e)
 {
