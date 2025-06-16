@@ -99,6 +99,8 @@ class ofxDatGuiComponent : public ofxDatGuiInteractiveObject
         void onWindowResized(ofResizeEventArgs &e);
 
         static const ofxDatGuiTheme* getTheme();
+
+        void setScrollOffsetY(float offsetY);
     
     protected:
     
@@ -168,6 +170,8 @@ class ofxDatGuiComponent : public ofxDatGuiInteractiveObject
         void drawBackground();
         void positionLabel();
         void setComponentStyle(const ofxDatGuiTheme* t);
+
+        float mScrollOffsetY = 0;
     
     private:
     

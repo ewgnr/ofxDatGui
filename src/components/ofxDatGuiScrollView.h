@@ -48,7 +48,6 @@ class ofxDatGuiScrollViewItem : public ofxDatGuiButton {
 class ofxDatGuiScrollView : public ofxDatGuiComponent {
 
     public:
-    
         ofxDatGuiScrollView(string name, int nVisible = 6) : ofxDatGuiComponent(name)
         {
             mAutoHeight = true;
@@ -226,7 +225,7 @@ class ofxDatGuiScrollView : public ofxDatGuiComponent {
         {
             mBackground = color;
         }
-    
+  
     /*
         update & draw
     */

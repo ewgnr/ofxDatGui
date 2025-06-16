@@ -1,4 +1,4 @@
-/*
+﻿/*
     Copyright (C) 2015 Stephen Braitsch [http://braitsch.io]
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -306,7 +306,7 @@ ofxDatGuiSlider* ofxDatGui::addSlider(ofParameter<float>& p)
 
 ofxDatGuiSlider* ofxDatGui::addSlider(string label, float min, float max)
 {
-// default to halfway between min & max values //
+    // default to halfway between min & max values //
     ofxDatGuiSlider* slider = addSlider(label, min, max, (max+min)/2);
     return slider;
 }
@@ -831,14 +831,18 @@ void ofxDatGui::update()
 {
     if (!mVisible) return;
 
-    // check if we need to update components //
-    for (int i=0; i<items.size(); i++) {
+    // Check if we need to update component styles //
+    for (int i = 0; i < items.size(); i++) {
         if (mAlphaChanged) items[i]->setOpacity(mAlpha);
         if (mThemeChanged) items[i]->setTheme(mTheme);
         if (mWidthChanged) items[i]->setWidth(mWidth, mLabelWidth);
         if (mAlignmentChanged) items[i]->setLabelAlignment(mAlignment);
+        items[i]->setScrollOffsetY(mScrollOffset.y); // ✅ Inject scroll offset
     }
-    
+
+    if (mGuiHeader) mGuiHeader->setScrollOffsetY(mScrollOffset.y); // ✅ optional
+    if (mGuiFooter) mGuiFooter->setScrollOffsetY(mScrollOffset.y); // ✅ optional
+
     if (mThemeChanged || mWidthChanged) layoutGui();
 
     mTheme = nullptr;
@@ -846,63 +850,69 @@ void ofxDatGui::update()
     mWidthChanged = false;
     mThemeChanged = false;
     mAlignmentChanged = false;
-    
-    // check for gui focus change //
-    if (ofGetMousePressed() && mActiveGui->mMoving == false){
+
+    // Check for gui focus change //
+    if (ofGetMousePressed() && mActiveGui->mMoving == false) {
         ofPoint mouse = ofPoint(ofGetMouseX(), ofGetMouseY());
-        for (int i=mGuis.size()-1; i>-1; i--){
-        // ignore guis that are invisible //
-            if (mGuis[i]->getVisible() && mGuis[i]->hitTest(mouse)){
+        for (int i = mGuis.size() - 1; i > -1; i--) {
+            if (mGuis[i]->getVisible() && mGuis[i]->hitTest(mouse)) {
                 if (mGuis[i] != mActiveGui) mGuis[i]->focus();
                 break;
             }
         }
     }
 
-    if (!getFocused() || !mEnabled){
-    // update children but ignore mouse & keyboard events //
-        for (int i=0; i<items.size(); i++) items[i]->update(false);
-    }   else {
+    if (!getFocused() || !mEnabled) {
+        // Not focused, update but ignore input
+        for (int i = 0; i < items.size(); i++) {
+            items[i]->update(false);
+        }
+    }
+    else {
         mMoving = false;
         mMouseDown = false;
-    // this gui has focus so let's see if any of its components were interacted with //
-        if (mExpanded == false){
+
+        if (!mExpanded) {
             mGuiFooter->update();
             mMouseDown = mGuiFooter->getMouseDown();
-        }   else{
+        }
+        else {
             bool hitComponent = false;
-            for (int i=0; i<items.size(); i++) {
-                if (hitComponent == false){
+            for (int i = 0; i < items.size(); i++) {
+                if (!hitComponent) {
                     items[i]->update(true);
                     if (items[i]->getFocused()) {
                         hitComponent = true;
                         mMouseDown = items[i]->getMouseDown();
-                        if (mGuiHeader != nullptr && mGuiHeader->getDraggable() && mGuiHeader->getFocused()){
-                    // track that we're moving to force preserve focus //
+
+                        if (mGuiHeader && mGuiHeader->getDraggable() && mGuiHeader->getFocused()) {
                             mMoving = true;
                             ofPoint mouse = ofPoint(ofGetMouseX(), ofGetMouseY());
                             moveGui(mouse - mGuiHeader->getDragOffset());
                         }
-                    }   else if (items[i]->getIsExpanded()){
-                    // check if one of its children has focus //
-                        for (int j=0; j<items[i]->children.size(); j++) {
-                            if (items[i]->children[j]->getFocused()){
+                    }
+                    else if (items[i]->getIsExpanded()) {
+                        for (int j = 0; j < items[i]->children.size(); j++) {
+                            items[i]->children[j]->setScrollOffsetY(mScrollOffset.y); // child propagation
+                            items[i]->children[j]->update(true);
+                            if (items[i]->children[j]->getFocused()) {
                                 hitComponent = true;
                                 mMouseDown = items[i]->children[j]->getMouseDown();
                                 break;
                             }
                         }
                     }
-                }   else{
-            // update component but ignore mouse & keyboard events //
+                }
+                else {
                     items[i]->update(false);
                     if (items[i]->getFocused()) items[i]->setFocused(false);
                 }
             }
         }
     }
-// empty the trash //
-    for (int i=0; i<trash.size(); i++) delete trash[i];
+
+    // Empty the trash
+    for (int i = 0; i < trash.size(); i++) delete trash[i];
     trash.clear();
 }
 
