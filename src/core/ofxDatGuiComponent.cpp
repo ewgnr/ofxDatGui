@@ -352,7 +352,7 @@ void ofxDatGuiComponent::update(bool acceptEvents)
 {
     if (acceptEvents && mEnabled && mVisible){
         bool mp = ofGetMousePressed();
-        ofPoint mouse = ofPoint(ofGetMouseX() - mMask.x, ofGetMouseY() - mMask.y);
+        ofPoint mouse = ofPoint(ofGetMouseX() - mMask.x, ofGetMouseY() - mMask.y + mScrollOffsetY);
         if (hitTest(mouse)){
             if (!mMouseOver){
                 onMouseEnter(mouse);
@@ -502,4 +502,8 @@ void ofxDatGuiComponent::onWindowResized(ofResizeEventArgs &e)
     onWindowResized();
 }
 
+void ofxDatGuiComponent::setScrollOffsetY(float offsetY)
+{
+    mScrollOffsetY = offsetY;
+}
 

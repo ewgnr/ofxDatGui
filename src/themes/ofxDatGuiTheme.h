@@ -170,13 +170,13 @@ class ofxDatGuiTheme{
         struct {
         
         // general rules that are shared by all components //
-            float width = 270.0f;
-            float height = 26.0f;
+            float width = 520.0f; // 270.0f
+            float height = 32.0f; // 26.0f
             float padding = 2.0f;
             float vMargin = 1.0f; // vertical spacing between gui components //
-            float iconSize = 10.0f;
-            float labelWidth = 95.0f;
-            float labelMargin = 12.0f;
+            float iconSize = 10.0f; // 4.0f
+            float labelWidth = 200.0f; // 95.0f
+            float labelMargin = 6.0f; // 12.0f
             float breakHeight = 3.0f;
             bool upperCaseLabels = true;
             
@@ -218,7 +218,7 @@ class ofxDatGuiTheme{
         static string AssetPath;
     
         struct {
-            int size = 6;
+            int size = 12;
             string file = AssetPath + "ofxbraitsch/fonts/Verdana.ttf";
             shared_ptr<ofxSmartFont> ptr;
         } font;
