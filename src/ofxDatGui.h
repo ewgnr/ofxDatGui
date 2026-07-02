@@ -97,7 +97,7 @@ class ofxDatGui : public ofxDatGuiInteractiveObject
         ofxDatGuiFolder* getFolder(string label);
         ofxDatGuiDropdown* getDropdown(string label);
 
-        void ofxDatGui::enableFboMode(bool enable, int width, int height);
+        void enableFboMode(bool enable, int width, int height);
         ofTexture& getFboTexture();
 
         void setScrollY(float y);
@@ -135,7 +135,7 @@ class ofxDatGui : public ofxDatGuiInteractiveObject
         vector<ofxDatGuiComponent*> trash;
         static ofxDatGui* mActiveGui;
         static vector<ofxDatGui*> mGuis;
-        static unique_ptr<ofxDatGuiTheme> theme;
+        static std::unique_ptr<ofxDatGuiTheme> theme;
     
         void init();
         void layoutGui();

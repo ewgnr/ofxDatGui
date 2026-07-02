@@ -175,7 +175,7 @@ class ofxDatGuiComponent : public ofxDatGuiInteractiveObject
     
     private:
     
-        static unique_ptr<ofxDatGuiTheme> theme;
+        static std::unique_ptr<ofxDatGuiTheme> theme;
     
 };
 
